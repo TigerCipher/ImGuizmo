@@ -1212,6 +1212,10 @@ namespace IMGUIZMO_NAMESPACE
 
       gContext.mRadiusSquareCenter = screenRotateSize * gContext.mHeight;
 
+      // added by rebirth
+      constexpr float circleLineThickness = 6.0f;
+      constexpr float lineThickness = 6.0f;
+
       bool hasRSC = Intersects(op, ROTATE_SCREEN);
       for (int axis = 0; axis < 3; axis++)
       {
@@ -1235,7 +1239,7 @@ namespace IMGUIZMO_NAMESPACE
          }
          if (!gContext.mbUsing || usingAxis)
          {
-            drawList->AddPolyline(circlePos, circleMul* halfCircleSegmentCount + 1, colors[3 - axis], false, 2);
+            drawList->AddPolyline(circlePos, circleMul* halfCircleSegmentCount + 1, colors[3 - axis], false, lineThickness);
          }
 
          float radiusAxis = sqrtf((ImLengthSqr(worldToPos(gContext.mModel.v.position, gContext.mViewProjection) - circlePos[0])));
@@ -1246,7 +1250,7 @@ namespace IMGUIZMO_NAMESPACE
       }
       if(hasRSC && (!gContext.mbUsing || type == MT_ROTATE_SCREEN))
       {
-         drawList->AddCircle(worldToPos(gContext.mModel.v.position, gContext.mViewProjection), gContext.mRadiusSquareCenter, colors[0], 64, 3.f);
+         drawList->AddCircle(worldToPos(gContext.mModel.v.position, gContext.mViewProjection), gContext.mRadiusSquareCenter, colors[0], 64, circleLineThickness);
       }
 
       if (gContext.mbUsing && (gContext.mActualID == -1 || gContext.mActualID == gContext.mEditingID) && IsRotateType(type))
@@ -1306,6 +1310,10 @@ namespace IMGUIZMO_NAMESPACE
          scaleDisplay = gContext.mScale;
       }
 
+      // added by rebirth
+      constexpr float circleSize = 12.0f;
+      constexpr float lineThickness = 6.0f;
+
       for (int i = 0; i < 3; i++)
       {
          if(!Intersects(op, static_cast<OPERATION>(SCALE_X << i)))
@@ -1330,15 +1338,15 @@ namespace IMGUIZMO_NAMESPACE
 
                if (gContext.mbUsing && (gContext.mActualID == -1 || gContext.mActualID == gContext.mEditingID))
                {
-                  drawList->AddLine(baseSSpace, worldDirSSpaceNoScale, IM_COL32(0x40, 0x40, 0x40, 0xFF), 3.f);
-                  drawList->AddCircleFilled(worldDirSSpaceNoScale, 6.f, IM_COL32(0x40, 0x40, 0x40, 0xFF));
+                  drawList->AddLine(baseSSpace, worldDirSSpaceNoScale, IM_COL32(0x40, 0x40, 0x40, 0xFF), lineThickness);
+                  drawList->AddCircleFilled(worldDirSSpaceNoScale, circleSize, IM_COL32(0x40, 0x40, 0x40, 0xFF));
                }
 
                if (!hasTranslateOnAxis || gContext.mbUsing)
                {
-                  drawList->AddLine(baseSSpace, worldDirSSpace, colors[i + 1], 3.f);
+                  drawList->AddLine(baseSSpace, worldDirSSpace, colors[i + 1], lineThickness);
                }
-               drawList->AddCircleFilled(worldDirSSpace, 6.f, colors[i + 1]);
+               drawList->AddCircleFilled(worldDirSSpace, circleSize, colors[i + 1]);
 
                if (gContext.mAxisFactor[i] < 0.f)
                {
@@ -1478,6 +1486,11 @@ namespace IMGUIZMO_NAMESPACE
       // draw
       bool belowAxisLimit = false;
       bool belowPlaneLimit = false;
+
+      // added by rebirth
+      constexpr float arrowSize = 12.0f;
+      constexpr float lineThickness = 6.0f;
+
       for (int i = 0; i < 3; ++i)
       {
          vec_t dirPlaneX, dirPlaneY, dirAxis;
@@ -1491,16 +1504,16 @@ namespace IMGUIZMO_NAMESPACE
                ImVec2 baseSSpace = worldToPos(dirAxis * 0.1f * gContext.mScreenFactor, gContext.mMVP);
                ImVec2 worldDirSSpace = worldToPos(dirAxis * gContext.mScreenFactor, gContext.mMVP);
 
-               drawList->AddLine(baseSSpace, worldDirSSpace, colors[i + 1], 3.f);
+               drawList->AddLine(baseSSpace, worldDirSSpace, colors[i + 1], lineThickness);
 
                // Arrow head begin
                ImVec2 dir(origin - worldDirSSpace);
 
                float d = sqrtf(ImLengthSqr(dir));
                dir /= d; // Normalize
-               dir *= 6.0f;
+               dir *= arrowSize;
 
-               ImVec2 ortogonalDir(dir.y, -dir.x); // Perpendicular vector
+               ImVec2 ortogonalDir(dir.y * 0.8f, -dir.x * 0.8f); // Perpendicular vector
                ImVec2 a(worldDirSSpace + dir);
                drawList->AddTriangleFilled(worldDirSSpace - dir, a + ortogonalDir, a - ortogonalDir, colors[i + 1]);
                // Arrow head end
